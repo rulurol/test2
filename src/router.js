@@ -1,0 +1,55 @@
+import { createRouter, createWebHistory } from "vue-router"
+import Home from "./views/Home.vue"
+import Base from "./views/Base.vue"
+
+const routes = [
+  {
+    path: "/",
+    alias: "/home",
+    component: Home
+  },
+  //View: Base
+  {
+    path: "/incomes",
+    component: Base,
+    props: {
+      page: "incomes",
+      pageTitle: "Incomes",
+      isStocksPage: false
+    }
+  },
+  {
+    path: "/orders",
+    component: Base,
+    props: {
+      page: "orders",
+      pageTitle: "Orders",
+      isStocksPage: false
+    }
+  },
+  {
+    path: "/stocks",
+    component: Base,
+    props: {
+      page: "stocks",
+      pageTitle: "Stocks",
+      isStocksPage: true
+    }
+  },
+  {
+    path: "/sales",
+    component: Base,
+    props: {
+      page: "sales",
+      pageTitle: "Sales",
+      isStocksPage: false
+    }
+  }
+]
+
+const router = createRouter({
+  history: createWebHistory(),
+  linkActiveClass: "pagenav__item--active",
+  routes
+})
+export default router

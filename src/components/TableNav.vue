@@ -3,7 +3,7 @@
     <div class="table-nav">
       <span class="table-nav__desc  table-nav__elem">Press "Enter" to set the value of the field</span>
       <label class="table-nav__elem">
-        <span>page (from 1 to {{ maxPage || 1 }}):</span>
+        <span>page {{maxPage ? `(from 1 to ${maxPage})` : "isn't available"}}:</span>
         <input
           type="number"
           step="1"
@@ -12,10 +12,11 @@
           @keyup="handlePage"
           :value="page"
           class="table-nav__input"
+          :disabled="!maxPage"
         >
       </label>
       <label class="table-nav__elem">
-        <span>items per page (from 1 to {{ maxLimit }}):</span>
+        <span>items per page {{maxLimit ? `(from 1 to ${maxLimit})` : "isn't available"}}:</span>
         <input
           type="number"
           step="1"
@@ -24,6 +25,7 @@
           @keyup="handleLimit"
           :value="limit"
           class="table-nav__input"
+          :disabled="!maxLimit"
         >
       </label>
     </div>
@@ -34,7 +36,7 @@
           type="date"
           :max="dateTo"
           :value="dateFrom"
-          :disabled="isStocksTab"
+          :disabled="isStocksPage"
           @change="handleDateFrom"
           class="table-nav__input"
         >
@@ -46,7 +48,7 @@
           :max="MAX_DATE"
           :min="dateFrom"
           :value="dateTo"
-          :disabled="isStocksTab"
+          :disabled="isStocksPage"
           @change="handleDateTo"
           class="table-nav__input"
         >
@@ -58,7 +60,7 @@
 <script setup>
 import { MAX_DATE } from '@/model'
 
-const {page, limit} = defineProps(["maxPage", "maxLimit", "isStocksTab", "page", "limit", "dateFrom", "dateTo"])
+const {page, limit} = defineProps(["maxPage", "maxLimit", "isStocksPage", "page", "limit", "dateFrom", "dateTo"])
 const emit = defineEmits(["changePage", "changeLimit", "changeDateFrom", "changeDateTo"])
 
 
@@ -78,7 +80,7 @@ const handleDateTo = (e) => {
 }
 </script>
 
-<style>
+<style scoped>
 .table-nav-container {
   display: flex;
   flex-wrap: wrap;

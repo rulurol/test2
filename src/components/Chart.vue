@@ -4,7 +4,7 @@
     <span class="chart__desc">Group table values by: </span>
     <select @change="emit('chartKeyChange', $event.target.value)" :value="chartKey">
       <option value="" disabled selected>Choose a field</option>
-      <option v-for="name, i in keyNames" :value="dataKeys[i]">{{ name }}</option>
+      <option v-for="name, i in dataHeaders" :value="dataKeys[i]">{{ name }}</option>
     </select>
     <div v-show="chartKey" class="chart__items">
       <div v-for="[k, v] in vals.entries()" class="chart__item">
@@ -22,26 +22,29 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 
 const MAX_HEIGHT = 150
 const MIN_COLOR = 140
 const MULT_COLOR = 75
 
-const {data, keyNames, dataKeys, chartKey} = defineProps(["data", "dataKeys", "keyNames", "chartKey"])
+const {data, dataHeaders, dataKeys, chartKey} = defineProps(["data", "dataKeys", "dataHeaders", "chartKey"])
 const emit = defineEmits(["chartKeyChange"])
 
 const vals = computed(() => {
   let maxVal = 0
   const map = new Map()
+  if (!chartKey) return map
   for (const item of data) {
     const v = (map.get(item[chartKey]) || 0) + 1
     map.set(item[chartKey], v)
     if (v > maxVal) maxVal = v
   }
-  if (map.has("")) {
-    map.set("no value", map.get(""))
+  if (map.has("") || map.has(null) || map.has(undefined)) {
+    map.set("no value", (map.get("") || 0) + (map.get(null) || 0) + (map.get(undefined) || 0))
     map.delete("")
+    map.delete(null)
+    map.delete(undefined)
   }
   for (const [k, v] of map.entries()) {
     const part = v / maxVal
@@ -56,7 +59,7 @@ const vals = computed(() => {
 })
 </script>
 
-<style>
+<style scoped>
 .chart__heading {
   font-size: 1.5rem;
   font-weight: 600;
