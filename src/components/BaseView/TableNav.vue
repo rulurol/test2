@@ -58,7 +58,10 @@
 </template>
 
 <script setup>
-import { MAX_DATE } from '@/model'
+import { getMaxDate } from '@/dateFunctions'
+
+
+const MAX_DATE = getMaxDate()
 
 const {page, limit} = defineProps(["maxPage", "maxLimit", "isStocksPage", "page", "limit", "dateFrom", "dateTo"])
 const emit = defineEmits(["changePage", "changeLimit", "changeDateFrom", "changeDateTo"])

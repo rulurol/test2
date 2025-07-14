@@ -9,16 +9,3 @@
 <script setup>
 import PageNav from './components/PageNav.vue'
 </script>
-
-<style scoped>
-.main-container {
-  padding: 10px;
-}
-.footer {
-  background-color: #dfdfdf;
-  padding: 15px;
-  color: #626262;
-  text-align: center;
-  margin-top: auto;
-}
-</style>

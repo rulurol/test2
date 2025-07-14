@@ -15,6 +15,7 @@
 <style scoped>
 .pagenav-container {
   box-shadow: 0 2px 6px #4446;
+  overflow-x: auto;
 }
 .pagenav {
   display: flex;

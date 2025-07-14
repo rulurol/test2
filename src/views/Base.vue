@@ -29,13 +29,19 @@
 
 <script setup>
 import { computed, ref, watch, watchEffect } from 'vue'
-import TableNav from '../components/TableNav.vue'
-import DataTable from '../components/DataTable.vue'
-import { fetchData, MAX_DATE, MAX_LIMIT, INITIAL_PAGE, INITIAL_LIMIT, INITIAL_DATE_BEFORE } from '../model'
-import Chart from '../components/Chart.vue'
+import TableNav from '../components/BaseView/TableNav.vue'
+import DataTable from '../components/BaseView/DataTable.vue'
+import { fetchData, MAX_LIMIT } from '../model'
+import Chart from '../components/BaseView/Chart.vue'
+import { getDateBefore, getMaxDate } from '@/dateFunctions'
 
 
+const INITIAL_LIMIT = 20
+const INITIAL_PAGE = 1
+const MAX_DATE = getMaxDate()
+const INITIAL_DATE_BEFORE = getDateBefore(30)
 const {page, pageTitle, isStocksPage} = defineProps(["page", "pageTitle", "isStocksPage"])
+
 
 const chartKey = ref("")
 const tablePage = ref(0)
@@ -54,6 +60,7 @@ watch(() => page, () => {
   tablePage.value = INITIAL_PAGE
   limit.value = INITIAL_LIMIT
   isHeaderChanged = true
+  document.title = pageTitle
 }, {immediate: true})
 
 let dataHeaders = null
@@ -71,12 +78,3 @@ watchEffect(async () => {
   }
 }, {flush: "post"})
 </script>
-
-<style scoped>
-.main-container__heading {
-  font-size: 2rem;
-  font-weight: 600;
-  color: #333;
-  margin: 12px 0;
-}
-</style>
