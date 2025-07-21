@@ -1,12 +1,29 @@
 import { createRouter, createWebHistory } from "vue-router"
 import Home from "./views/Home.vue"
 import Base from "./views/Base.vue"
+import StatPage from "./views/StatPage.vue"
 
 const routes = [
   {
-    path: "/",
-    alias: "/home",
+    path: "/home",
+    alias: "/",
     component: Home
+  },
+  {
+    path: "/home/total-price",
+    component: StatPage
+  },
+  {
+    path: "/home/discount-percent",
+    component: StatPage
+  },
+  {
+    path: "/home/cancel-count",
+    component: StatPage
+  },
+  {
+    path: "/home/oblasts",
+    component: StatPage
   },
   //View: Base
   {

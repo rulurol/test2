@@ -1,6 +1,8 @@
 <template>
   <section>
-    <h3 class="data-filter-container__heading">{{ title }}</h3>
+    <h3 class="data-filter-container__heading">
+      {{ periodName === "cur" ? "Current" : "Previous" }} period
+    </h3>
     <article class="data-filter-container">
       <div class="data-filter">
         <span class="data-filter__desc  data-filter__elem">Press "Enter" to set the value of the field</span>
@@ -12,7 +14,7 @@
             :max="maxPage"
             min="1"
             @keyup="handlePage"
-            :value="page"
+            :value="dataPeriods[period].params.page"
             class="data-filter__input"
             :disabled="!maxPage"
           >
@@ -25,7 +27,7 @@
             :max="maxLimit"
             min="1"
             @keyup="handleLimit"
-            :value="limit"
+            :value="dataPeriods[period].params.limit"
             class="data-filter__input"
             :disabled="!maxLimit"
           >
@@ -36,8 +38,8 @@
           <span>date from:</span>
           <input
             type="date"
-            :max="dateTo"
-            :value="dateFrom"
+            :max="dataPeriods[period].params.dateTo"
+            :value="dataPeriods[period].params.dateFrom"
             @change="handleDateFrom"
             class="data-filter__input"
           >
@@ -47,8 +49,8 @@
           <input
             type="date"
             :max="MAX_DATE"
-            :min="dateFrom"
-            :value="dateTo"
+            :min="dataPeriods[period].params.dateFrom"
+            :value="dataPeriods[period].params.dateTo"
             @change="handleDateTo"
             class="data-filter__input"
           >
@@ -60,25 +62,35 @@
 
 <script setup>
 import { getMaxDate } from '@/dateFunctions'
+import { MAX_LIMIT } from '@/model'
+import { useDataPeriodsStore } from '@/store/dataPeriods'
+import { computed } from 'vue'
 
 const MAX_DATE = getMaxDate()
 
-const {page, limit, title} = defineProps(["maxPage", "maxLimit", "page", "limit", "dateFrom", "dateTo", "title"])
-const emit = defineEmits(["changePage", "changeLimit", "changeDateFrom", "changeDateTo"])
+const {periodName} = defineProps(["periodName"])
+const dataPeriods = useDataPeriodsStore()
+
+const period = periodName === dataPeriods.cur.periodName ? "cur" : "prev"
+
+const maxPage = computed(() => Math.ceil(dataPeriods[period].data.total / dataPeriods[period].params.limit))
+const maxLimit = computed(() => Math.min(MAX_LIMIT, Math.ceil(dataPeriods[period].data.total / dataPeriods[period].params.page)))
+
 
 const handlePage = (e) => {
-  if (e.key !== "Enter" || e.target.value === "" || Number(e.target.value) === page) return
-  emit("changePage", Number(e.target.value))
+  if (e.key !== "Enter" || e.target.value === "" || Number(e.target.value) === dataPeriods[period].params.page) return
+  dataPeriods[period].params.page = Number(e.target.value)
 }
 const handleLimit = (e) => {
-  if (e.key !== "Enter" || e.target.value === "" || Number(e.target.value) === limit) return
-  emit("changeLimit", Number(e.target.value))
+  if (e.key !== "Enter" || e.target.value === "" || Number(e.target.value) === dataPeriods[period].params.limit) return
+  dataPeriods[period].params.limit = Number(e.target.value)
 }
 const handleDateFrom = (e) => {
-  emit("changeDateFrom", e.target.value)
+  console.log(e.key)
+  dataPeriods[period].params.dateFrom = e.target.value
 }
 const handleDateTo = (e) => {
-  emit("changeDateTo", e.target.value)
+  dataPeriods[period].params.dateTo = e.target.value
 }
 </script>
 

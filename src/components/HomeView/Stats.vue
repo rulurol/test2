@@ -1,5 +1,5 @@
 <template>
-  <section v-if="prev !== null && cur !== null">
+  <section v-if="dataPeriods.statsByField !== null">
     <h2 class="stats__heading">Stats</h2>
     <div class="stats__description">
       <h3 class="stats__description-heading">How it's counted?</h3>
@@ -9,49 +9,34 @@
       <p>Oblasts: number of unique values from fieds <span class="field-name">oblast</span></p>
       <p>Grouped by field <span class="field-name">nm_id</span></p>
     </div>
-    <StatElem title="Total price" :items="totalPrice"/>
-    <StatElem title="Discount percent" :items="discountPercent"/>
-    <StatElem title="Cancel count" :items="cancelCount"/>
-    <StatElem title="Oblasts" :items="oblasts"/>
+    <section v-for="[title, statField, linkTo] in statItems">
+      <h3 class="stat-heading">{{ title }}</h3>
+      <RouterLink :to="`/home/${linkTo}`" class="stat-chart-container">
+        <StatChart
+          v-if="dataPeriods.statsByField[statField][0][3] !== dataPeriods.statsByField[statField][dataPeriods.statsByField[statField].length-1][3]"
+          :statField="statField"
+        />
+        <div v-else>No difference between previous and current periods</div>
+      </RouterLink>
+      <StatTable :statField="statField"/>
+    </section>
   </section>
   <div v-else>No data to show</div>
 </template>
 
 <script setup>
-import { watchEffect, ref } from 'vue'
-import StatElem from './StatElem.vue'
+import { useDataPeriodsStore } from '@/store/dataPeriods'
+import StatTable from './StatTable.vue'
+import StatChart from './StatChart.vue'
+const dataPeriods = useDataPeriodsStore()
 
-const {prev, cur} = defineProps(["prev", "cur"])
-
-const totalPrice = ref(null)
-const discountPercent = ref(null)
-const cancelCount = ref(null)
-const oblasts = ref(null)
-
-
-const sortDescending = (a, b) => b[3] - a[3]
-const getPercent = (baseV, newV) => baseV === 0 ? 0 : Math.floor((newV / baseV - 1) * 1000) / 10
-watchEffect(() => {
-  if (cur === null || prev === null) return
-  totalPrice.value = []
-  discountPercent.value = []
-  cancelCount.value = []
-  oblasts.value = []
-
-  for (const [k, v] of cur.entries()) {
-    if (prev.has(k)) {
-      const pv = prev.get(k)
-      totalPrice.value.push([k, v.totalPrice, pv.totalPrice, getPercent(pv.totalPrice, v.totalPrice)])
-      discountPercent.value.push([k, v.totalPrice, pv.discountPercent, getPercent(pv.discountPercent, v.totalPrice)])
-      cancelCount.value.push([k, v.cancelCount, pv.cancelCount, getPercent(pv.cancelCount, v.cancelCount)])
-      oblasts.value.push([k, v.oblasts.size, pv.oblasts.size, getPercent(pv.oblasts.size, v.oblasts.size)])
-    }
-  }
-  totalPrice.value.sort(sortDescending)
-  discountPercent.value.sort(sortDescending)
-  cancelCount.value.sort(sortDescending)
-  oblasts.value.sort(sortDescending)
-})
+const statItems = [
+  //[title, statField, linkTo]
+  ["Total price", "totalPrice", "total-price"],
+  ["Discount percent", "discountPercent", "discount-percent"],
+  ["Cancel count", "cancelCount", "cancel-count"],
+  ["Oblasts", "oblasts", "oblasts"]
+]
 </script>
 
 <style scoped>
@@ -78,5 +63,23 @@ watchEffect(() => {
   background-color: #e2e2e2;
   color: #222;
   padding: 1px 2px;
+}
+
+.stat-heading {
+  font-size: 1.15rem;
+  font-weight: 500;
+  margin-top: 10px;
+  margin-bottom: 5px;
+}
+.stat-chart-container {
+  padding: 6px;
+  user-select: none;
+  background-color: #f0f0f0;
+  width: max-content;
+  max-width: 100%;
+  display: block;
+  margin: 10px 0;
+  overflow-x: auto;
+  box-sizing: border-box;
 }
 </style>
