@@ -61,7 +61,6 @@ const item = computed(() => {
   const id = Number(route.params.id)
   const fromCur = dataPeriods.cur.data.data.findIndex(d => d.nm_id === id)
   const fromPrev = dataPeriods.prev.data.data.findIndex(d => d.nm_id === id)
-  console.log(fromCur, fromPrev, id, typeof dataPeriods.cur.data.data[0].nm_id)
   if (fromCur === -1 || fromPrev === -1) return null
 
   const stat = {}

@@ -13,13 +13,14 @@
     @changeDateFrom="dateFrom = $event"
     @changeDateTo="dateTo = $event"
   />
+  <Filters/>
   <DataTable
-    :data="data.data"
+    :data="filteredData"
     :dataHeaders="dataHeaders"
     :dataKeys="dataKeys"
   />
   <Chart
-    :data="data.data"
+    :data="filteredData"
     :dataHeaders="dataHeaders"
     :dataKeys="dataKeys"
     :chartKey="chartKey"
@@ -34,6 +35,8 @@ import DataTable from '../components/BaseView/DataTable.vue'
 import { fetchData, MAX_LIMIT } from '../model'
 import Chart from '../components/BaseView/Chart.vue'
 import { getDateBefore, getMaxDate } from '@/dateFunctions'
+import Filters from '@/components/Filters.vue'
+import { useFiltersStore } from '@/store/filters'
 
 
 const INITIAL_LIMIT = 20
@@ -76,5 +79,23 @@ watchEffect(async () => {
       dataHeaders[i] = dataHeaders[i].replaceAll("_", " ")
     }
   }
-}, {flush: "post"})
+})
+
+const filters = useFiltersStore()
+const filteredData = computed(() => {
+  const arr = []
+  for (const item of data.value.data) {
+    let isPassed = true
+    for (const field of filters.filterFields) {
+      if (filters[field] !== "" && String(item[field]) !== filters[field]) {
+        isPassed = false
+        break
+      }
+    }
+    if (isPassed) {
+      arr.push(item)
+    }
+  }
+  return arr
+})
 </script>

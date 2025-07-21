@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from "vue-router"
 import Home from "./views/Home.vue"
 import Base from "./views/Base.vue"
 import StatPage from "./views/StatPage.vue"
-import ItemNamePage from "./views/ItemNamePage.vue"
+import ItemPage from "./views/ItemPage.vue"
 
 const routes = [
   {
@@ -28,7 +28,7 @@ const routes = [
   },
   {
     path: "/home/item/:id",
-    component: ItemNamePage
+    component: ItemPage
   },
   //View: Base
   {

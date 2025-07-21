@@ -16,7 +16,7 @@
           v-if="dataPeriods.statsByField[statField][0][3] !== dataPeriods.statsByField[statField][dataPeriods.statsByField[statField].length-1][3]"
           :statField="statField"
         />
-        <div v-else>No difference between previous and current periods</div>
+        <div v-else>All values are the same</div>
       </RouterLink>
       <StatTable :statField="statField"/>
     </section>

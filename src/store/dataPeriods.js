@@ -14,7 +14,7 @@ const INITIAL_PAGE = 1
 
 //helper functions
 const calculateStats = (data) => {
-  if (!data) return null
+  if (!data.length) return null
 
   const map = new Map()
   for (const item of data) {
@@ -34,43 +34,57 @@ const calculateStats = (data) => {
   return map
 }
 
+const filterData = (data, filters = {filterFields: []}) => {
+  const arr = []
+  for (const item of data) {
+    let isPassed = true
+    for (const field of filters.filterFields) {
+      if (filters[field] !== "" && String(item[field]) !== filters[field]) {
+        isPassed = false
+        break
+      }
+    }
+    if (isPassed) {
+      arr.push(item)
+    }
+  }
+  return arr
+}
+
+const makeReactivePeriod = (page, limit, dateFrom, dateTo, data, periodName) => {
+  const period = reactive({
+    periodName,
+    params: {
+      dateFrom,
+      dateTo,
+      page,
+      limit
+    },
+
+    data,
+    async updateData(filters) {
+      period.data = await fetchData("orders", period.params.page, period.params.limit, period.params.dateFrom, period.params.dateTo)
+      period.updateFilteredData(filters)
+    },
+
+    filteredData: [],
+    updateFilteredData(filters) {
+      period.filteredData = filterData(period.data.data, filters)
+      period.stats = calculateStats(period.filteredData)
+    },
+
+    stats: null
+  })
+  return period
+}
+
 const sortDescending = (a, b) => b[3] - a[3]
 const getPercent = (baseV, newV) => baseV === 0 ? 0 : Math.floor((newV / baseV - 1) * 1000) / 10
 
 
 const useDataPeriodsStore = defineStore("dataPeriods", () => {
-  const cur = reactive({
-    periodName: "cur",
-    params: {
-      dateFrom: CUR_BEFORE_DATE,
-      dateTo: CUR_MAX_DATE,
-      page: INITIAL_PAGE,
-      limit: INITIAL_LIMIT
-    },
-    data: INITIAL_DATA,
-    stats: null,
-    async update() {
-      console.log("update current")
-      cur.data = await fetchData("orders", cur.params.page, cur.params.limit, cur.params.dateFrom, cur.params.dateTo)
-      cur.stats = calculateStats(cur.data.data)
-    }
-  })
-  const prev = reactive({
-    params: {
-      periodName: "prev",
-      dateFrom: PREV_BEFORE_DATE,
-      dateTo: PREV_MAX_DATE,
-      page: INITIAL_PAGE,
-      limit: INITIAL_LIMIT
-    },
-    data: INITIAL_DATA,
-    stats: null,
-    async update() {
-      console.log("update previous")
-      prev.data = await fetchData("orders", prev.params.page, prev.params.limit, prev.params.dateFrom, prev.params.dateTo)
-      prev.stats = calculateStats(prev.data.data)
-    }
-  })
+  const cur = makeReactivePeriod(INITIAL_PAGE, INITIAL_LIMIT, CUR_BEFORE_DATE, CUR_MAX_DATE, INITIAL_DATA, "cur")
+  const prev = makeReactivePeriod(INITIAL_PAGE, INITIAL_LIMIT, PREV_BEFORE_DATE, PREV_MAX_DATE, INITIAL_DATA, "prev")
 
   const statsByField = computed(() => {
     if (cur.stats === null || prev.stats === null) return null
@@ -93,7 +107,7 @@ const useDataPeriodsStore = defineStore("dataPeriods", () => {
     obj.discountPercent.sort(sortDescending)
     obj.cancelCount.sort(sortDescending)
     obj.oblasts.sort(sortDescending)
-    return obj
+    return obj.totalPrice.length ? obj : null
   })
 
   return {cur, prev, statsByField, isFromInside: false}
