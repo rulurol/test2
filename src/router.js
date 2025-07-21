@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from "vue-router"
 import Home from "./views/Home.vue"
 import Base from "./views/Base.vue"
 import StatPage from "./views/StatPage.vue"
+import ItemNamePage from "./views/ItemNamePage.vue"
 
 const routes = [
   {
@@ -24,6 +25,10 @@ const routes = [
   {
     path: "/home/oblasts",
     component: StatPage
+  },
+  {
+    path: "/home/item/:id",
+    component: ItemNamePage
   },
   //View: Base
   {

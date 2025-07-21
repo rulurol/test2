@@ -1,6 +1,6 @@
 <template>
+    <RouterLink to="/home" class="home-link">Go to home page</RouterLink>
     <div v-if="dataPeriods.statsByField !== null">
-      <RouterLink to="/home" class="home-link">Go to home page</RouterLink>
       <h1 class="stat-heading">{{ title }} page</h1>
       <div class="stat-chart-container">
         <StatChart

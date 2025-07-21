@@ -11,7 +11,7 @@
       </thead>
       <tbody>
         <tr v-for="item in dataPeriods.statsByField[statField]" class="table__row">
-          <td class="table__cell">{{ item[0] }}</td>
+          <td class="table__cell"><RouterLink :to="`/home/item/${item[0]}`">{{ item[0] }}</RouterLink></td>
           <td class="table__cell">{{ item[1] }}</td>
           <td class="table__cell">{{ item[2] }}</td>
           <td v-if="item[3] === 0" class="table__cell">= {{ item[3] }}%</td>
@@ -25,6 +25,7 @@
 
 <script setup>
 import { useDataPeriodsStore } from '@/store/dataPeriods'
+import { RouterLink } from 'vue-router';
 
 defineProps(["statField"])
 const dataPeriods = useDataPeriodsStore()
